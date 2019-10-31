@@ -8,6 +8,7 @@ X = dataset[:,0:-2]
 X=np.asarray(X).astype('float32')
 Y = dataset[:,-1:]
 
+
 #Перемешивание вариантов
 indices = np.arange(dataset.shape[0])
 np.random.shuffle(indices)
