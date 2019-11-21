@@ -40,11 +40,19 @@ X /= std
 
 from keras import models
 from keras import layers
+from keras import regularizers
 #%%
 model = models.Sequential()
-model.add(layers.Dense(32, activation='relu', input_shape=(X.shape[1], )))
+model.add(
+    layers.Dense(32,
+                 kernel_regularizer=regularizers.l2(0.001),
+                 activation='relu',
+                 input_shape=(X.shape[1], )))
 #model.add(layers.BatchNormalization())
-model.add(layers.Dense(32, activation='relu'))
+model.add(
+    layers.Dense(32,
+                 kernel_regularizer=regularizers.l2(0.001),
+                 activation='relu'))
 #model.add(layers.BatchNormalization())
 #model.add(layers.Dense(32,activation='relu'))
 #model.add(layers.Dense(16,activation='relu'))
@@ -54,7 +62,7 @@ model.compile(optimizer='rmsprop',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-history = model.fit(X, Y, epochs=14, batch_size=32, validation_split=0.3)
+history = model.fit(X, Y, epochs=23, batch_size=32, validation_split=0.3)
 #model.save_weights('Dense_model.h5')
 
 #графики изменения качества модели
