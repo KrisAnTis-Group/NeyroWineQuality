@@ -1,5 +1,6 @@
 import numpy as np
  
+ 
 # загружаем данные с фичами
 dataset = np.loadtxt("/home/krisantis/Desktop/Vine/red/winequality-red.txt", delimiter=";")
 
