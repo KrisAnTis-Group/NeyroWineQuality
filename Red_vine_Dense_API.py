@@ -1,96 +1,108 @@
+import os
+os.environ['PYTHONHASHSEED'] = str(0)
+
+#%%
 import numpy as np
- 
 
+np.random.seed(2)
 
- 
 # загружаем данные с фичами
-dataset = np.loadtxt("/home/krisantis/Desktop/Vine/red/winequality-red.txt", delimiter=";")
+dataset = np.loadtxt("/home/krisantis/Desktop/Vine/red/winequality-red.txt",
+                     delimiter=";")
+
+X = dataset[:, 0:-1]
+X = np.asarray(X).astype('float32')
+Y = dataset[:, -1:]
+Y = np.asarray(Y).astype('int')
 
 
-X = dataset[:,0:8]
-X_text = dataset[:,8:108]
-X=np.asarray(X).astype('float32')
-Y = dataset[:,-1:]
+def to_one_hot(labels, demension=10):
+    results = np.zeros((len(labels), demension))
+    for i, label in enumerate(labels):
+        results[i, label] = 1
+    return results
 
+
+Y = to_one_hot(Y)
+
+#Перемешивание вариантов
 indices = np.arange(dataset.shape[0])
 np.random.shuffle(indices)
 X = X[indices]
-X_text = X_text[indices]
 Y = Y[indices]
 
-#обучение на выборке из 20000 образцов
-training_samples = 1500000
-#проверка на выборке из 5000
-validation_samples = 500000
-
-X_train = X[:training_samples]
-X_text_train = X_text[:training_samples]
-Y_train = Y[:training_samples]
-X_val = X[training_samples : training_samples + validation_samples]
-X_text_val = X_text[training_samples : training_samples + validation_samples]
-Y_val = Y[training_samples : training_samples + validation_samples]
-
 #нормализация
-mean = X_train.mean(axis=0)
-X_train -= mean
-std = X_train.std(axis=0)
-X_train /= std
+mean = X.mean(axis=0)
+X -= mean
+std = X.std(axis=0)
+X /= std
 
-X_val -= mean
-X_val /= std
+#X1 = np.column_stack((X[:,1],X[:,5],X[:,6],X[:,8],X[:,10]))   #2,6,7,9,11    3,5,8,9,10
+#X2 = np.column_stack((X[:,0],X[:,2],X[:,3],X[:,4],X[:,7]))    #1,3,4,5,8     2,5,6,7,9
+#X3 = np.column_stack((X[:,2],X[:,3],X[:,7],X[:,8],X[:,9]))   #3,4,8,9,10     1,4,5,10,11
+
+#X1 = np.column_stack((X[:,2],X[:,4],X[:,7],X[:,8],X[:,9]))   #3,5,8,9,10
+#X2 = np.column_stack((X[:,1],X[:,4],X[:,5],X[:,6],X[:,8]))    #2,5,6,7,9
+#X3 = np.column_stack((X[:,0],X[:,3],X[:,4],X[:,9],X[:,10]))   #1,4,5,10,11
+
+X1 = np.column_stack(
+    (X[:, 2], X[:, 4], X[:, 7], X[:, 8], X[:, 9]))  #3,5,8,9,10
+X2 = np.column_stack((X[:, 1], X[:, 5], X[:, 6]))  #2,5,6,7,9
+X3 = np.column_stack((X[:, 0], X[:, 3], X[:, 10]))  #1,4,5,10,11
+#начинаем формировать апи сеть
 
 #начинаем формировать апи сеть
 
 from keras.models import Sequential
-from keras.layers import Embedding, Flatten, Dense
+from keras.layers import Flatten, Dense
 from keras.models import Model
 from keras import layers
 from keras import Input
 
-digit_train_size = X_train.shape[1]
-text_train_size = X_text_train.shape[1]
-answer_train_size = 1
-max_words = 10000
-embedding_dim = 300
+#--------------- digit-2,6,7,9,11-----------------
+digit_input_1 = Input(shape=(X1.shape[1], ))
+dense_digit_layer_1 = layers.Dense(64, activation='relu')(digit_input_1)
+dense_digit_layer_1 = layers.Dense(32, activation='relu')(dense_digit_layer_1)
+dense_digit_layer_1 = layers.Dense(16, activation='relu')(dense_digit_layer_1)
 
-#--------------- digit-----------------
-digit_input = Input(shape=(digit_train_size,))
-dense_digit_layer = layers.Dense(64, activation='relu')(digit_input)
-dense_digit_layer = layers.Dense(32, activation='relu')(dense_digit_layer)
-dense_digit_layer = layers.Dense(32, activation='relu')(dense_digit_layer)
+#--------------- digit-1,3,4,5,8-----------------
+digit_input_2 = Input(shape=(X2.shape[1], ))
+dense_digit_layer_2 = layers.Dense(64, activation='relu')(digit_input_2)
+dense_digit_layer_2 = layers.Dense(32, activation='relu')(dense_digit_layer_2)
+dense_digit_layer_2 = layers.Dense(16, activation='relu')(dense_digit_layer_2)
 
-#--------------- text-----------------
-text_input = Input(shape=(text_train_size,), dtype='float32')
-embidding_text_layer = layers.Embedding(max_words,embedding_dim)(text_input)
-#embidding_text_flatten_layer = layers.Flatten()(embidding_text_layer)
-LSTM_text_layer = layers.LSTM(32)(embidding_text_layer)
-dense_text_layer = layers.Dense(32, activation='relu')(LSTM_text_layer)
+#--------------- digit-,4,8,9,10-----------------
+digit_input_3 = Input(shape=(X3.shape[1], ))
+dense_digit_layer_3 = layers.Dense(64, activation='relu')(digit_input_3)
+dense_digit_layer_3 = layers.Dense(32, activation='relu')(dense_digit_layer_3)
+dense_digit_layer_3 = layers.Dense(16, activation='relu')(dense_digit_layer_3)
 
 #--------------- concatenated-----------------
-concatenated = layers.concatenate([dense_digit_layer,LSTM_text_layer], axis=-1)
+concatenated = layers.concatenate(
+    [dense_digit_layer_1, dense_digit_layer_2, dense_digit_layer_3], axis=-1)
 
-conc_layrs = layers.Dense(32, activation='relu')(concatenated)
-conc_layrs = layers.Dense(32, activation='relu')(conc_layrs)
-answer = layers.Dense(1)(conc_layrs)
+conc_layrs = layers.Dense(16, activation='relu')(concatenated)
+conc_layrs = layers.Dense(16, activation='relu')(conc_layrs)
+answer = layers.Dense(10, activation='softmax')(conc_layrs)
 
-model = Model([digit_input,text_input],answer)
+model = Model([digit_input_1, digit_input_2, digit_input_3], answer)
 
-#предобучение embidding векторами glowe
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
 
-#model.layers[4].set_weights([embedding_matrix])
-#model.layers[4].trainable = False
-
-model.compile(optimizer='rmsprop', loss='mse', metrics=['acc'])
-
-history = model.fit([X_train, X_text_train], Y_train, epochs=5, batch_size=512,validation_data=([X_val, X_text_val], Y_val))
-model.save_weights('pre_trained_glove_digit_text_api_model.h5')
+history = model.fit([X1, X2, X3],
+                    Y,
+                    epochs=20,
+                    batch_size=32,
+                    validation_split=0.3)
 
 #графики изменения качества модели
 
 import matplotlib.pyplot as plt
 
-acc=history.history['acc']
-val_acc = history.history['val_acc']
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
