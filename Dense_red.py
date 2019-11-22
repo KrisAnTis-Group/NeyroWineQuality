@@ -1,13 +1,14 @@
-#%%
-# воспроизводимость
 import os
-import numpy as np
 os.environ['PYTHONHASHSEED'] = str(0)
-np.random.seed(2)
 
 #%%
+import numpy as np
+
+np.random.seed(2)
+
 # загружаем данные с фичами
-dataset = np.loadtxt("DataSet/winequality-white.txt", delimiter=";")
+
+dataset = np.loadtxt("DataSet/winequality-red.txt", delimiter=";")
 
 X = dataset[:, 0:-1]
 X = np.asarray(X).astype('float32')
@@ -15,8 +16,6 @@ Y = dataset[:, -1:]
 Y = np.asarray(Y).astype('int')
 
 
-#%%
-# преобразуем ответы в вектор
 def to_one_hot(labels, demension):
     results = np.zeros((len(labels), demension))
     step_shift = labels.min()
@@ -28,27 +27,22 @@ def to_one_hot(labels, demension):
 size_output_demension = int(Y.max() - Y.min() + 1)
 Y = to_one_hot(Y, size_output_demension)
 
-#%%
 #Перемешивание вариантов
 indices = np.arange(dataset.shape[0])
 np.random.shuffle(indices)
 X = X[indices]
 Y = Y[indices]
 
-#%%
 #нормализация
 mean = X.mean(axis=0)
 X -= mean
 std = X.std(axis=0)
 X /= std
 
-#%%
-# подключение библиотек машинного обучения
 from keras import models
 from keras import layers
 from keras import regularizers
 #%%
-# конструирование модели
 model = models.Sequential()
 model.add(layers.Dense(32, activation='relu', input_shape=(X.shape[1], )))
 model.add(layers.BatchNormalization())
@@ -58,18 +52,15 @@ model.add(layers.BatchNormalization())
 model.add(layers.Dense(16, activation='relu'))
 model.add(layers.Dense(size_output_demension, activation='softmax'))
 
-# параметры компиляции
 model.compile(optimizer='rmsprop',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-#%%
-# обучение
-history = model.fit(X, Y, epochs=26, batch_size=32, validation_split=0.3)
+history = model.fit(X, Y, epochs=34, batch_size=32, validation_split=0.3)
 #model.save_weights('Dense_model.h5')
 
-#%%
 #графики изменения качества модели
+#%%
 import matplotlib.pyplot as plt
 
 acc = history.history['accuracy']
