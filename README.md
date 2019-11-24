@@ -2,8 +2,8 @@
 Материалы тестового задания: 
 построить модель определения качества вина на основе его физико-химических характеристик.
 
-##Инструкция по запуску
-Чтобы запустить ноутбук с семинара на своей машине:
+## Инструкция по запуску
+###Чтобы запустить ноутбук с семинара на своей машине:
 
 1) Cклонируйте репозиторий курса:
 
@@ -19,9 +19,9 @@
 `first_vine_white.py`
 `RedAndWhite.py`
 
-Замечание: Результатом работы считается файл RedAndWhite - он объединяет white и red наборы данных
+#### Замечание: Результатом работы считается файл RedAndWhite - он объединяет white и red наборы данных
 
-Чтобы запустить ноутбук на [Google Colab](https://colab.research.google.com):
+###Чтобы запустить ноутбук на [Google Colab](https://colab.research.google.com):
 
 0) Откройте [Google Colab](https://colab.research.google.com)
 
@@ -37,7 +37,7 @@ import sys; sys.path.append('/content/NeyroWineQuality')
 3) Не забудьте настроить `device='cpu'` (модель работает на cpu - установлено по умолчанию на Google Colab), а также выбрать подходящий Runtime в Google Colab (CPU/TPU/GPU).
 
 4) Запустите ноутбук.
-##DataSet
+## DataSet
 [Wine Quality Data Set](https://archive.ics.uci.edu/ml/datasets/Wine+Quality)
   
 Dua, D. and Graff, C. (2019). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science.
