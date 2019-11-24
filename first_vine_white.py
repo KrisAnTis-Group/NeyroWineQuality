@@ -1,9 +1,6 @@
 #%%
 # воспроизводимость
-import os
 import numpy as np
-os.environ['PYTHONHASHSEED'] = str(0)
-np.random.seed(2)
 
 #%%
 # загружаем данные с фичами
@@ -54,7 +51,6 @@ model.add(layers.Dense(32, activation='relu', input_shape=(X.shape[1], )))
 model.add(layers.BatchNormalization())
 model.add(layers.Dense(32, activation='relu'))
 model.add(layers.BatchNormalization())
-#model.add(layers.Dense(32, activation='relu'))
 model.add(layers.Dense(16, activation='relu'))
 model.add(layers.Dense(size_output_demension, activation='softmax'))
 
