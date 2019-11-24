@@ -29,10 +29,10 @@
 
 2) Чтобы выкачать на colab библиотеку dlnlputils, не забудьте выполнить команду в первой ячейке:
 
-...
+```
 import sys; sys.path.append('/content/NeyroWineQuality')
 !git clone https://github.com/KrisAnTis-Group/NeyroWineQuality.git && pip install -r NeyroWineQuality/requirements.txt
-...
+```
 
 3) Не забудьте настроить `device='cpu'` (модель работает на cpu - установлено по умолчанию на Google Colab), а также выбрать подходящий Runtime в Google Colab (CPU/TPU/GPU).
 
