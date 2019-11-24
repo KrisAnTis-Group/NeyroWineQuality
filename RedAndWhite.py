@@ -15,6 +15,7 @@ X = np.asarray(X).astype('float32')
 Y = np.asarray(Y).astype('int')
 
 
+#%%
 #векторизация меток(целей)
 #количество меток рассчитывается исходя из датасета
 def to_one_hot(labels, demension):
@@ -31,6 +32,7 @@ Y = to_one_hot(Y, size_output_demension)
 print("DataSet:\nattributes: ", X.shape[1], "\nsamples:", X.shape[0],
       "\nclass labels:", size_output_demension)
 
+#%%
 #Перемешивание вариантов
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
@@ -59,6 +61,7 @@ X_train /= std
 X_val -= mean
 X_val /= std
 
+#%%
 #импорт библиотек Keras
 from keras import models
 from keras import layers
@@ -78,6 +81,7 @@ model.add(layers.Dense(16, activation='relu'))
 model.add(layers.BatchNormalization())
 model.add(layers.Dense(size_output_demension, activation='softmax'))
 
+#%%
 #обучение модели
 model.compile(optimizer=RMSprop(lr=1e-4),
               loss='categorical_crossentropy',
@@ -89,6 +93,7 @@ history = model.fit(X_train,
                     batch_size=64,
                     validation_data=[X_val, Y_val])
 
+#%%
 #графики изменения качества модели
 import matplotlib.pyplot as plt
 
@@ -112,3 +117,5 @@ plt.title('Training and validation loss')
 plt.legend()
 
 plt.show()
+
+# %%
